@@ -16,7 +16,7 @@ if (__name__ == "__main__"):
                 data = json.loads(file.read())
                 posting.process_file(data["content"], indexStorage)
 
-
+    
 
 
 
