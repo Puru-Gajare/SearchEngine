@@ -3,17 +3,13 @@ from bs4 import BeautifulSoup
 import os
 from bs4 import BeautifulSoup
 from collections import defaultdict
-from tokenizer import tokenize
+from tokenizer import *
 import posting
 import shelve
 import json
 from posting import Posting
 from posting import ListOfPostings
 
-
-def calculateTokenFrequency(token, tokenList) -> int:
-    # return count of token in tokenList
-    return 0
 
 
 def buildIndex() -> None:
@@ -32,7 +28,7 @@ def buildIndex() -> None:
     urlStorage = dict()
 
     # currentDocID (will get incremented as we iterate through each file)
-    docID = 0
+    docID = 1
 
     for root, dirs, files in os.walk("./DEV"):
         for file in files:
@@ -47,21 +43,25 @@ def buildIndex() -> None:
                 text = soup.get_text()
 
                 # tokenize html, get list of all tokens
-                tokens = list()
                 tokens = tokenize(text)
 
+                # get dictionary that has counts of all tokens
+                tokenFrequencies = computeWordFrequencies(tokens)
+
                 # iterate through tokens
-                for token in tokens:
+                for token in tokenFrequencies.keys():
                     # if token not in indexStorage then add it as a key with value being empty ListOfPostings
                     if token not in indexStorage:
                         indexStorage[token] = ListOfPostings()
 
-                    currentPosting = Posting(docID, calculateTokenFrequency(token, tokens))         # Create new posting object
+                    # Create new posting object with specified id and frequency
+                    currentPosting = Posting(docID, tokenFrequencies[token])      
 
-                    indexStorage[token].addPosting(currentPosting)                  # append new Posting object to indexStorage[token]
+                    # append new Posting object to indexStorage[token]
+                    indexStorage[token].addPosting(currentPosting)
 
                 # set docID to point to new url 
-                #urlStorage[docID] = url            uncomment this when you spin back
+                urlStorage[docID] = file          # file is the correct url right?
                 
                 # increment docID
                 docID += 1

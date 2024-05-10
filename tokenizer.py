@@ -40,3 +40,26 @@ def tokenize(inputString):
     return result
 
 
+# Runtime Complexity: O(N), where n is the number of values in
+# the argument tokenList; This is because we are iterating through
+# each item in tokenList one time, so as n grows, the runtime of our
+# program will grow linearly
+def computeWordFrequencies(tokenList):
+    '''
+    Returns a dictionary containing the frequency of each word
+    in tokenList
+    '''
+
+    result = dict()
+
+    # for every token in list, increment its frequency
+    for token in tokenList:
+        #if token already exists in dictionary, increment it's value
+        if token in result:
+            result[token] += 1
+
+        # if token doesn't exist as key in dictionary, initialize it's value to 1
+        else:
+            result[token] = 1
+
+    return result
