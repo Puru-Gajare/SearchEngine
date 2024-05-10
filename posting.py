@@ -21,5 +21,25 @@ class ListOfPostings:
 
         self.postingsList.append(posting)
 
+    def getLength(self) -> int:
+        '''
+        return length
+        '''
+
+        return len(self.postingsList)
+    
+    def getStringOfPostings(self) -> None:
+        '''
+        return string representation of list of postings so it's easier to write to file
+        '''
+        postingsListString = ''
+
+        for posting in self.postingsList:
+            singlePostingString = '(' + str(posting.docID) + ', ' + str(posting.token_freq) + ') '
+            postingsListString += singlePostingString
+
+        return postingsListString
+
+
 
             

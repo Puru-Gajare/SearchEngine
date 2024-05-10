@@ -20,7 +20,7 @@ def tokenize(inputString):
         if not char:            # if character doesn't exist, break loop
             break
 
-        if char.isalnum() and ord(char) <= 127:
+        if char.isalnum() and ord(char) <= 127 or char == "'":
             # if current character is alphanumeric, then add
             currentWord += char.lower()
         else:

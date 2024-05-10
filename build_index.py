@@ -9,6 +9,14 @@ import shelve
 import json
 from posting import Posting
 from posting import ListOfPostings
+from nltk.stem import PorterStemmer
+from nltk.stem import SnowballStemmer
+from nltk.tokenize import word_tokenize
+from nltk.tokenize import RegexpTokenizer
+
+
+
+
 
 
 
@@ -32,38 +40,53 @@ def buildIndex() -> None:
 
     for root, dirs, files in os.walk("./DEV"):
         for file in files:
-            with open(file, "r") as current_file:
-                data = json.loads(file.read())
-                #posting.process_file(data["content"], indexStorage)
-                html_content = data["content"]
+            fileToOpen = os.path.join(root, file)       # get actual path of file
+
+            with open(fileToOpen, "r", errors='ignore') as current_file:
+                try:
+                    data = json.loads(current_file.read())
+                    #posting.process_file(data["content"], indexStorage)
+                    html_content = data["content"]
 
 
-                # Extract all text elements from the parsed HTML
-                soup = BeautifulSoup(html_content, 'html.parser')
-                text = soup.get_text()
+                    # Extract all text elements from the parsed HTML
+                    soup = BeautifulSoup(html_content, 'html.parser')
+                    text = soup.get_text()
 
-                # tokenize html, get list of all tokens
-                tokens = tokenize(text)
+                    # tokenize html, get list of all tokens
+                    #tokens = tokenize(text)
+                    #tokens =  word_tokenize(text)
+                    tokenizer = RegexpTokenizer(r'\w+')
+                    tokens = tokenizer.tokenize(text)
 
-                # get dictionary that has counts of all tokens
-                tokenFrequencies = computeWordFrequencies(tokens)
 
-                # iterate through tokens
-                for token in tokenFrequencies.keys():
-                    # if token not in indexStorage then add it as a key with value being empty ListOfPostings
-                    if token not in indexStorage:
-                        indexStorage[token] = ListOfPostings()
+                    # Use porter stemmer to standardize all words
+                    # ex: turns [likely, liking] => [like, like]
+                    stemmer = SnowballStemmer(language='english')
+                    stemmed_tokens = [stemmer.stem(token) for token in tokens]
 
-                    # Create new posting object with specified id and frequency
-                    currentPosting = Posting(docID, tokenFrequencies[token])      
 
-                    # append new Posting object to indexStorage[token]
-                    indexStorage[token].addPosting(currentPosting)
+                    # get dictionary that has counts of all tokens
+                    tokenFrequencies = computeWordFrequencies(stemmed_tokens)
 
-                # set docID to point to new url 
-                urlStorage[docID] = file          # file is the correct url right?
-                
-                # increment docID
-                docID += 1
+                    # iterate through tokens
+                    for token in tokenFrequencies.keys():
+                        # if token not in indexStorage then add it as a key with value being empty ListOfPostings
+                        if token not in indexStorage:
+                            indexStorage[token] = ListOfPostings()
+
+                        # Create new posting object with specified id and frequency
+                        currentPosting = Posting(docID, tokenFrequencies[token])      
+
+                        # append new Posting object to indexStorage[token]
+                        indexStorage[token].addPosting(currentPosting)
+
+                    # set docID to point to new url 
+                    urlStorage[docID] = file          # file is the correct url right?
+                    
+                    # increment docID
+                    docID += 1
+                except json.decoder.JSONDecodeError as e:
+                    continue
 
     return indexStorage, urlStorage
