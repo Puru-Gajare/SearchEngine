@@ -17,9 +17,6 @@ from nltk.tokenize import RegexpTokenizer
 
 
 
-
-
-
 def buildIndex() -> None:
     '''
     iterate through every file and build out an inverse index represented
@@ -37,6 +34,9 @@ def buildIndex() -> None:
 
     # currentDocID (will get incremented as we iterate through each file)
     docID = 1
+
+    # used to count number of documents so we can load off files to disk periodically
+    docCount = 0
 
     for root, dirs, files in os.walk("./DEV"):
         for file in files:
@@ -86,7 +86,30 @@ def buildIndex() -> None:
                     
                     # increment docID
                     docID += 1
+                    docCount += 1
+
+                    # if number of documents has reached threshold, output to disk, clear dictionary, and reset docCount
+                    if docCount == 100000:
+                        outputToFile(indexStorage)
+                        docCount = 0
+
+                    
                 except json.decoder.JSONDecodeError as e:
                     continue
 
     return indexStorage, urlStorage
+
+
+def outputToFile(indexStorage) -> None:
+    '''
+    loads off files from indexStorage in order to meet constraint
+    '''
+
+    # ouput to file in correct format
+    with open('dev_index.txt', 'w') as file:
+        for key in indexStorage:
+            file.write(key + " : "  + indexStorage[key].getStringOfPostings() + '\n\n')
+
+    # clear dictionary to free up memory
+    indexStorage.clear()
+
