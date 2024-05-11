@@ -1,5 +1,4 @@
-
-# IMPORTANT: modify tokenize so that it takes string
+from collections import defaultdict
 
 # Runtime Complexity: O(N) where n is # of characters in file
 # since as n grows, the amount of time our program will take in
@@ -20,11 +19,12 @@ def tokenize(inputString):
         if not char:            # if character doesn't exist, break loop
             break
 
+        # if current character is alphanumeric, then add
         if char.isalnum() and ord(char) <= 127:
-            # if current character is alphanumeric, then add
             currentWord += char.lower()
+
+        # if current character is not alphanumeric, reset
         else:
-            # if current character is not alphanumeric, reset
             if currentWord != "":
                 result.append(currentWord)
             currentWord = ""
@@ -35,8 +35,11 @@ def tokenize(inputString):
     if currentWord != "":
         result.append(currentWord)
 
-
-
     return result
 
 
+def compute_word_frequencies(tokens) -> defaultdict:
+    frequencies = defaultdict(int)
+    for token in tokens:
+        frequencies[token] += 1
+    return frequencies
