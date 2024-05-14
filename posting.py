@@ -1,60 +1,47 @@
-from tokenizer import *
-from bs4 import BeautifulSoup
-import shelve
 
-
+# class to represent indivdual posting
+# for now only has docID and frequency but can add fields, etc. later
 class Posting:
-    def __init__(self, website_name, hash, token_freq) -> None:
-        self.website_name = website_name
-        self.hash = hash
-        self.token_freq = token_freq
-        
+    def __init__(self, id: int, freq: int) -> None:
+        self.docID = id
+        self.token_freq = freq
 
 
+# class to represent list of postings
+# decided to use a class in order to make potential future changes slightly easier
 class ListOfPostings:
     def __init__(self) -> None:
-        self.listOfUrlIds = list()
+        self.postingsList = list()
 
-    def addURL(self, docID: str, frequency: int):
-        if len(self.listOfUrlsIds) == 0:
-            self.listOfUrlsIds.append(docID)
-            return
-        
-        # find index to insert at
-        index = 0
-        for id in self.listOfUrlsIds:
-            if id > docID:
-                break
-            
-            index += 1
+    def addPosting(self, posting) -> None:
+        '''
+        add posting to posting list
 
-        self.listOfUrlIds.insert(index, docID)
+        '''
 
-def process_file( html_content: str, indexStorage: shelve.Shelf, docID: int ) -> None:
-    '''
-    takes in html content, tokenizes it, and adds it to storage dictionary
+        self.postingsList.append(posting)
 
-    @return: 
-    '''
+    def getLength(self) -> int:
+        '''
+        return length
+        '''
+
+        return len(self.postingsList)
     
-    # Extract all text elements from the parsed HTML
-    soup = BeautifulSoup(html_content, 'html.parser')
-    text = soup.get_text()
+    def getStringOfPostings(self) -> None:
+        '''
+        return string representation of list of postings so it's easier to write to file
+        '''
+        postingsListString = ''
 
-    # tokenize html, get list of all tokens
-    tokens = list()   # change after tokenize function gets updated
+        for posting in self.postingsList:
+            singlePostingString = '(' + str(posting.docID) + ',' + str(posting.token_freq) + ') '
+            postingsListString += singlePostingString
 
-    tokens = list(set(tokenize(text)))   # eliminates duplicates
-    frequencies = compute_word_frequencies(tokens)
+        return postingsListString
+    
 
 
-    # iterate through tokens
-    for token, frequency in frequencies.items:
-        # if token already exists in storage, add url to it's list and increment frequency count
-        if token in indexStorage:
-            indexStorage[token].addURL(docID, frequency)
-        else:
-            indexStorage[token] = ListOfPostings()
-            indexStorage[token].addURL(docID, frequency)
-        # if token does not exist in storage, add it, add url to it's list, and set its frequency count to 0
+
+
             
