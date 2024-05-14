@@ -59,9 +59,8 @@ def buildIndex() -> None:
                     # tokenize html, get list of all tokens
                     #tokens = tokenize(text)
                     #tokens =  word_tokenize(text)
-                    tokenizer = RegexpTokenizer(r'\w+')
+                    tokenizer = RegexpTokenizer(r'\b[a-zA-Z]+\b')
                     tokens = tokenizer.tokenize(text)
-
 
                     # Use porter stemmer to standardize all words
                     # ex: turns [likely, liking] => [like, like]
@@ -92,14 +91,18 @@ def buildIndex() -> None:
                     docCount += 1
 
                     # if number of documents has reached threshold, output to disk, clear dictionary, and reset docCount
-                    if docCount == 30000:
+                    if docCount >= 10000:
                         outputToFile(indexStorage, fileCount)
                         docCount = 0
                         fileCount += 1
 
-                    
+                    # print(f"finished parsing document, doc count is {docCount}")
                 except json.decoder.JSONDecodeError as e:
                     continue
+
+    outputToFile(indexStorage, fileCount)
+    docCount = 0
+    fileCount += 1
 
     return indexStorage, urlStorage
 
@@ -108,13 +111,11 @@ def outputToFile(indexStorage, fileCount: int) -> None:
     '''
     loads off files from indexStorage in order to meet constraint
     '''
-
-    # ouput to file in correct format
     with open(f'indices/dev_index{fileCount}.txt', 'w') as file:
         indexStorage = dict(sorted(indexStorage.items()))  # sorts by key, which is the term
         for key in indexStorage:
             file.write(key + " : "  + indexStorage[key].getStringOfPostings() + '\n')
-
+    print(f"Wrote to file with file count: {fileCount}")
     # clear dictionary to free up memory
     indexStorage.clear()
 

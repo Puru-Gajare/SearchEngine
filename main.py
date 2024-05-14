@@ -19,9 +19,9 @@ if (__name__ == "__main__"):
 
 
     # output rest of urls to file
-    with open('dev_index.txt', 'w') as file:
-        for key in indexStorage:
-            file.write(key + " : "  + indexStorage[key].getStringOfPostings() + '\n\n')
+    # with open('dev_index.txt', 'w') as file:
+    #     for key in indexStorage:
+    #         file.write(key + " : "  + indexStorage[key].getStringOfPostings() + '\n\n')
 
     
 
