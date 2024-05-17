@@ -16,6 +16,7 @@ if (__name__ == "__main__"):
     # print # of urls, # of tokens
     print(len(urlStorage))
     print(len(indexStorage))
+    
 
 
     # output rest of urls to file
