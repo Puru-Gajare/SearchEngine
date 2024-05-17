@@ -17,11 +17,14 @@ Merge Algorithm:
 
 '''
 
-def openFiles(file1: str, file2: str, mergeNumber) -> tuple('file', 'file', 'file'):
-    with open(file1, 'r') as file1Obj:
-        with open(file2, 'r') as file2Obj:
-            with open(f"merged{mergeNumber}.txt", 'r') as file3:
-                return file1, file2, file3
+
+def openFiles(file1: str, file2: str, mergeNumber: int):
+    
+    return ( open(file1, 'r'), open(file2, "r"), open(f"merged{mergeNumber}.txt", 'w'))
+    # with open(file1, 'r') as file1Obj:
+    #     with open(file2, 'r') as file2Obj:
+    #         with open(f"merged{mergeNumber}.txt", 'w') as file3Obj:
+    #             return (file1Obj, file2Obj, file3Obj)
 
 
 def mergePostings(postingLine1: str, postingLine2: str) -> None:
@@ -44,7 +47,7 @@ def mergeTokens(file1: 'fileObj', file2: 'fileObj', writeFile: 'fileObj') -> Non
     This function merges two files and outputs a new file which contains the merged lists. 
     This calls mergePostings if it finds a term that appears in both. 
     '''
-
+ 
     # get the line from the file
     line1 = file1.readline()
     line2 = file2.readline()
