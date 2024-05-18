@@ -1,4 +1,4 @@
-
+import os
 
 '''
 Merge Algorithm:
@@ -18,25 +18,87 @@ Merge Algorithm:
 '''
 
 
+def constructFileList(folder_path) -> list["files"]:
+    '''
+    Returns list of all the files in indices
+
+    '''
+    listOfFiles = []
+    # List all entries in the directory
+    for entry in os.listdir(folder_path):
+        # Construct the full path
+        entry_path = os.path.join(folder_path, entry)
+        # Check if it is a file
+        if os.path.isfile(entry_path):
+           listOfFiles.append(entry_path)
+
+    return listOfFiles
+
+# def mergeAllFiles(folder: str):
+#     '''
+#     Takes all dev files and merges them together
+#     '''
+#     listOfFiles = sorted(constructFileList(folder)) # folder should be "./indices"    # will have [dev_index1, dev_index2, etc.]
+#     print(listOfFiles)
+#     mergedFileNo = 1
+#     firstFile = 0
+#     secondFile = 1
+#     files = openFiles(listOfFiles[firstFile], listOfFiles[secondFile], mergedFileNo)
+#     while (secondFile < len(listOfFiles) - 1):
+#         mergeTokens(*files)
+#         files[0].close()
+#         files[1].close()
+#         files[2].close()
+
+
+
+#         secondFile += 1
+#         files = openFiles(listOfFiles[secondFile], f"merged{mergedFileNo}.txt", mergedFileNo + 1)
+#         mergedFileNo += 1
+#         print("ended while loop with second file = ", secondFile)
+
+#     files[0].close()
+#     files[1].close()
+#     files[2].close()
+
+
+def mergeAllFiles(folder):
+    listOfFiles = sorted(constructFileList(folder))  # Ensure files are sorted for consistent merging
+    if not listOfFiles:
+        return
+
+    # Initial setup with the first file as base
+    currentBaseFile = listOfFiles[0]
+    for i in range(1, len(listOfFiles)):
+        with open(currentBaseFile, 'r') as baseFile, \
+             open(listOfFiles[i], 'r') as mergeFile, \
+             open(f"merged{i}.txt", 'w') as outputFile:
+
+            mergeTokens(baseFile, mergeFile, outputFile)
+
+        # Update the base file to the newly merged file
+        currentBaseFile = f"merged{i}.txt"
+    os.rename(currentBaseFile, 'final_merged.txt')  # Optionally rename the last merged file
+           
+
+
+
 def openFiles(file1: str, file2: str, mergeNumber: int):
     
     return ( open(file1, 'r'), open(file2, "r"), open(f"merged{mergeNumber}.txt", 'w'))
-    # with open(file1, 'r') as file1Obj:
-    #     with open(file2, 'r') as file2Obj:
-    #         with open(f"merged{mergeNumber}.txt", 'w') as file3Obj:
-    #             return (file1Obj, file2Obj, file3Obj)
 
 
-def mergePostings(postingLine1: str, postingLine2: str) -> None:
+def mergePostings(postingLine1: str, postingLine2: str) -> str:
     '''
     Merges postings of two equivalent tokens and returns
     '''
 
     # get part of string that's only the postings
     # parameters are initially formatted like: 'what : (1, 2) (2, 5) (6, 1) (10, 2) (20, 9)'
-    postingsListString1 = postingLine1.split(':')[1]
+    postingsListString1 = postingLine1.split(':')[1] 
     postingsListString2 = postingLine2.split(':')[1]
 
+    postingsListString1 = postingsListString1[:-1]
     
     # return concatenated string
     return postingsListString1 + postingsListString2
@@ -60,7 +122,8 @@ def mergeTokens(file1: 'fileObj', file2: 'fileObj', writeFile: 'fileObj') -> Non
 
     while (line1 != '' and line2 != ''):
         if token1 == token2:
-            writeToFile(writeFile, mergePostings(line1, line2))
+            postingsList = mergePostings(line1, line2)
+            writeToFile(writeFile, f"{token1} : {postingsList}")
 
             line1 = file1.readline()
             line2 = file2.readline()
@@ -101,3 +164,5 @@ def getTokenFromStr(line: str) -> str:
 
 def writeToFile(writeFile: 'fileObj', line: str) -> None:
     writeFile.write(line)
+
+
